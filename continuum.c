@@ -5,18 +5,15 @@
 
 #define BSIZE 1638
 #define ARGSIZE 256
+#define DELEM "|"
 
 int main()
 {
-    //Open STDIN
-    
     int count;
     char buf[BSIZE];
     while ((count = fread(buf, 1, BSIZE, stdin)) > 0)
     {
-        /* fprintf(stdout, "%s", buf); */
-        /* fflush(stdout); */
-        char *args[ARGSIZE];
+        char *args[ARGSIZE] = {};
         char *arg_ptr;
         int arg_index = 0;
         switch(buf[0])
@@ -25,10 +22,12 @@ int main()
                 system("xdotool click 1");
                 break;
             case 'm':
-                while ((arg_ptr = strtok(buf, "|")) != NULL)
+                strtok(buf, DELEM);
+                while (arg_ptr != NULL && arg_index < ARGSIZE)
                 {
                     args[arg_index] = arg_ptr;
                     ++arg_index;
+                    arg_ptr = strtok(NULL, DELEM);
                 }
                 printf("Hello");
                 break;
