@@ -39,24 +39,52 @@ static void destroy_window(Display *dpy, Window *window)
     XDestroyWindow(dpy, *window);
 }
 
+//Write an arg to stdout
+static size_t write_data_out(void *data)
+{
+    size_t size = sizeof(data);
+    fwrite(data, size, 1, stdout);
+    return size;
+}
+
+// Pad stdout to 18 bytes
+static void pad_data_out(int bytes_written)
+{
+    while (bytes_written < 19)
+    {
+        fprintf(stdout, "%s", "\0");
+        ++bytes_written;
+    }
+}
+
 static void print_rawmotion(XIRawEvent *event)
 {
     int i;
     double *raw_valuator = event->raw_values,
            *valuator = event->valuators.values;
 
-    printf("    device: %d (%d)\n", event->deviceid, event->sourceid);
+    //printf("    device: %d (%d)\n", event->deviceid, event->sourceid);
+    /* fprintf(stdout, "m"); */
+    
+    // m
+    int m = 109;
+    write_data_out(&m);
 
     for (i = 0; i < event->valuators.mask_len * 8; i++)
     {
         if (XIMaskIsSet(event->valuators.mask, i))
         {
-            printf("  acceleration on valuator %d: %f <%f %f>\n",
-                    i, *valuator - *raw_valuator, *valuator, *raw_valuator);
+            //printf("  acceleration on valuator %d: %f <%f %f>\n",
+            //        i, *valuator - *raw_valuator, *valuator, *raw_valuator);
+            /* fprintf(stdout, "|%f", *valuator - *raw_valuator); */
+            double data = *valuator - *raw_valuator;
+            write_data_out(&data);
             valuator++;
             raw_valuator++;
         }
     }
+    pad_data_out(17);
+    fflush(stdout);
 }
 
 int main (int argc, char **argv)
@@ -122,7 +150,7 @@ int main (int argc, char **argv)
             !XGetEventData(dpy, cookie))
             continue;
 
-        printf("EVENT TYPE %d\n", cookie->evtype);
+        //printf("EVENT TYPE %d\n", cookie->evtype);
         if (cookie->evtype == XI_RawMotion)
             print_rawmotion(cookie->data);
 
