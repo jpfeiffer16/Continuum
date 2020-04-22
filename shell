@@ -1,0 +1,3 @@
+#!/bin/sh
+xdotool mousemove x y
+xdotool click 1

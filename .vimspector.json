@@ -1,0 +1,34 @@
+{
+    "configurations": {
+        "Continuum: Launch": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "Continuum: Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/bin/cont",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+            }
+        },
+        "Continuum: Attach": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "Continuum: Attach",
+                "type": "cppdbg",
+                "request": "attach",
+                "program": "${workspaceFolder}/bin/cont",
+                "MIMode": "gdb",
+                "attach": {
+                    "pidProperty": "processId", 
+                    "pidSelect": "ask"
+                }
+            }
+        }
+    }
+}
