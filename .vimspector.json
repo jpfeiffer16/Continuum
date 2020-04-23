@@ -29,6 +29,22 @@
                     "pidSelect": "ask"
                 }
             }
+        },
+        "Temp: Launch": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "Temp: Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/bin/temp",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+            }
         }
     }
 }

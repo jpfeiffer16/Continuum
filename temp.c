@@ -40,9 +40,8 @@ static void destroy_window(Display *dpy, Window *window)
 }
 
 //Write an arg to stdout
-static size_t write_data_out(void *data)
+static size_t write_data_out(void *data, size_t size)
 {
-    size_t size = sizeof(data);
     fwrite(data, size, 1, stdout);
     return size;
 }
@@ -50,9 +49,9 @@ static size_t write_data_out(void *data)
 // Pad stdout to 18 bytes
 static void pad_data_out(int bytes_written)
 {
-    while (bytes_written < 19)
+    while (bytes_written < 18)
     {
-        fprintf(stdout, "%s", "\0");
+        fprintf(stdout, "%c", '\0');
         ++bytes_written;
     }
 }
@@ -67,8 +66,8 @@ static void print_rawmotion(XIRawEvent *event)
     /* fprintf(stdout, "m"); */
     
     // m
-    int m = 109;
-    write_data_out(&m);
+    char m = 109;
+    write_data_out(&m, sizeof(char));
 
     for (i = 0; i < event->valuators.mask_len * 8; i++)
     {
@@ -78,13 +77,32 @@ static void print_rawmotion(XIRawEvent *event)
             //        i, *valuator - *raw_valuator, *valuator, *raw_valuator);
             /* fprintf(stdout, "|%f", *valuator - *raw_valuator); */
             double data = *valuator - *raw_valuator;
-            write_data_out(&data);
+            /* fprintf(stderr, "VAL: %f\n", *valuator); */
+            /* fprintf(stderr, "RAW: %f\n", *raw_valuator); */
+            write_data_out(valuator, sizeof(double));
+            /* fprintf(stderr, "%f\n", data); */
+            /* fflush(stderr); */
             valuator++;
             raw_valuator++;
         }
     }
     pad_data_out(17);
     fflush(stdout);
+}
+
+static void print_rawkeypress(XIRawEvent *event)
+{
+    fprintf(stderr, "KEY");
+    fflush(stderr);
+    double *valuator = event->valuators.values;
+    for (int i = 0; i < event->valuators.mask_len * 8; i++)
+    {
+        if (XIMaskIsSet(event->valuators.mask, i))
+        {
+            fprintf(stderr, "KEY: %f\n", *valuator);
+            fflush(stderr);
+        }
+    }
 }
 
 int main (int argc, char **argv)
@@ -103,7 +121,7 @@ int main (int argc, char **argv)
     }
 
     if (!XQueryExtension(dpy, "XInputExtension", &xi_opcode, &event, &error)) {
-        printf("X Input extension not available.\n");
+        fprintf(stderr, "X Input extension not available.\n");
         return -1;
     }
 
@@ -138,12 +156,16 @@ int main (int argc, char **argv)
                 //DefaultRootWindow(dpy)
                 None //works
                 , None);
-            printf("grabbed\n");
+            XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync, CurrentTime); 
         }
         //if ((ev.type == KeyPress)||(cookie->type == KeyPress)||(cookie->evtype == KeyPress)) { // TODO: no idea how to make this work, Alt+F4 on 'win' is needed, or C-c on terminal(after an alt+tab)
         //  // types like KeyPress and MapNotify are listed in /usr/include/X11/X.h
         //  break;
         //}
+        
+
+        fprintf(stderr, "%d\n", cookie->evtype);
+        fflush(stderr);
 
         if (cookie->type != GenericEvent ||
             cookie->extension != xi_opcode ||
@@ -151,6 +173,8 @@ int main (int argc, char **argv)
             continue;
 
         //printf("EVENT TYPE %d\n", cookie->evtype);
+        if (cookie->evtype == XI_RawKeyPress)
+            print_rawkeypress(cookie->data);
         if (cookie->evtype == XI_RawMotion)
             print_rawmotion(cookie->data);
 
