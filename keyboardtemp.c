@@ -17,6 +17,8 @@ int main()
                            0, 0, InputOnly, /* border, depth, class */
                            CopyFromParent, /* visual */
                            0, NULL); /* valuemask and attributes */
+    Display *redirect_display = XOpenDisplay(NULL);
+    Window redirect_window = XCreateWindow(redirect_display, rootwindow, -99, -99, 1, 1, 0, 0, InputOnly, CopyFromParent, 0, NULL);
 
     XSelectInput(display, window, StructureNotifyMask | SubstructureRedirectMask | ResizeRedirectMask | KeyPressMask | KeyReleaseMask);
     XLowerWindow(display, window);
@@ -38,9 +40,9 @@ int main()
         XNextEvent(display, &event);
 
         /* printf("%d\n", *((int*)event.xcookie.data)); */
-        printf("%d\n", event.xcookie.data == NULL);
+        /* printf("%d\n", event.xcookie.data == NULL); */
         if (event.type == KeyPress) {
-            printf("KeyPress: keycode %u state %u\n", event.xkey.keycode, event.xkey.state);
+            /* printf("KeyPress: keycode %u state %u\n", event.xkey.keycode, event.xkey.state); */
             fflush(stdout);
             // Forward event
             XEvent forwared_event;
@@ -49,12 +51,15 @@ int main()
             forwared_event.xkey.keycode = event.xkey.keycode;
             Bool cookie_value = True;
             forwared_event.xcookie.data = &cookie_value;
-            //XSendEvent(display, window, False, KeyPressMask, &forwared_event);
+            /* XUngrabKeyboard(display, CurrentTime); */
+            XSendEvent(redirect_display, redirect_window, True, KeyPress, &forwared_event);
+            XFlush(display);
+            /* XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime); */
 
         } else
         if (event.type == KeyRelease) {
 
-            printf("KeyRelease: keycode %u state %u\n", event.xkey.keycode, event.xkey.state);
+            /* printf("KeyRelease: keycode %u state %u\n", event.xkey.keycode, event.xkey.state); */
             fflush(stdout);
 
             if (event.xkey.keycode == escape)
@@ -66,13 +71,18 @@ int main()
             forwared_event.xkey.keycode = event.xkey.keycode;
             Bool cookie_value = True;
             forwared_event.xcookie.data = &cookie_value;
-            //XSendEvent(display, window, False, KeyReleaseMask, &forwared_event);
+            /* XUngrabKeyboard(display, CurrentTime); */
+            XSendEvent(redirect_display, redirect_window, True, KeyRelease, &forwared_event);
+            XFlush(display);
+            /* XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime); */
         } else
         if (event.type == UnmapNotify) {
 
             XUngrabKeyboard(display, CurrentTime);
             XDestroyWindow(display, window);
+            XDestroyWindow(redirect_display, redirect_window);
             XCloseDisplay(display);
+            XCloseDisplay(redirect_display);
 
             display = XOpenDisplay(NULL);
             rootwindow = DefaultRootWindow(display);
@@ -90,6 +100,8 @@ int main()
                 XNextEvent(display, &event);
             } while (event.type != MapNotify);
 
+            printf("Grabbing");
+            fflush(stdout);
             XGrabKeyboard(display, window, True, GrabModeAsync, GrabModeAsync, CurrentTime);
             XLowerWindow(display, window);
 
