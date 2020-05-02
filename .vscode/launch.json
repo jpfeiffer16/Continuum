@@ -5,6 +5,42 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "gdb",
+            "request": "attach",
+            "name": "Attach to PID Remote",
+            // "target": "${command:pickProcess}",
+            "cwd": "${workspaceRoot}",
+            "valuesFormatting": "parseText",
+            "ssh": {
+                "host": "192.168.1.15",
+                "user": "jpfeiffer",
+                "cwd": "/home/jpfeiffer/Continuum"
+            }
+        },
+        {
+            "name": "(gdb) Attach Rmote",
+            "type": "cppdbg",
+            "pipeTransport": {
+                "pipeCwd": "~/Source/continuum-remote",
+                "pipeProgram": "/usr/bin/ssh",
+                "pipeArgs": [
+                    "jpfeiffer@192.168.1.15"
+                ],
+                "debuggerPath": "/usr/bin/gdb.",
+            },
+            "request": "attach",
+            // "program": "${workspaceFolder}/bin/cont",
+            "processId": "${command:pickProcess}",
+            "MIMode": "gdb",
+            // "setupCommands": [
+            //     {
+            //         "description": "Enable pretty-printing for gdb",
+            //         "text": "-enable-pretty-printing",
+            //         "ignoreFailures": true
+            //     }
+            // ]
+        },
+        {
             "name": "(gdb) Attach",
             "type": "cppdbg",
             "request": "attach",
