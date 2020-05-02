@@ -157,6 +157,7 @@ int main (int argc, char **argv)
                 None //works
                 , None);
             XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync, CurrentTime); 
+            XGrabButton(dpy, AnyButton, AnyModifier, DefaultRootWindow(dpy), True, 0, GrabModeAsync, GrabModeAsync, None, None);
         }
         //if ((ev.type == KeyPress)||(cookie->type == KeyPress)||(cookie->evtype == KeyPress)) { // TODO: no idea how to make this work, Alt+F4 on 'win' is needed, or C-c on terminal(after an alt+tab)
         //  // types like KeyPress and MapNotify are listed in /usr/include/X11/X.h
