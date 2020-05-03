@@ -45,6 +45,22 @@
                 "MIMode": "gdb",
                 "miDebuggerPath": "/usr/bin/gdb"
             }
+        },
+        "New: Launch": {
+            "adapter": "vscode-cpptools",
+            "configuration": {
+                "name": "New: Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/bin/new",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+            }
         }
     }
 }
