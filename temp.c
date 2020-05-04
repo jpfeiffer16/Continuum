@@ -5,6 +5,10 @@
 #include <string.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput2.h>
+#include "record.h"
+
+Display *dpy;
+char capture_enabled = 0;
 
 static Window create_win(Display *dpy)
 {
@@ -105,9 +109,47 @@ static void print_rawkeypress(XIRawEvent *event)
     }
 }
 
+static void toggle_capture()
+{
+    if (capture_enabled)
+    {
+        // Uncapture
+        capture_enabled = 0;
+    }
+    else
+    {
+        /* stop_recording(); */
+        /* XSync(dpy, True); */
+        /* XFlush(dpy); */
+        // Capture
+        /* XGrabPointer(dpy, */
+        /*     //win */
+        /*     DefaultRootWindow(dpy) // no change when using this, well the mentioned bug(events duplicated) doesn't happen anymore, but I meant no change for my use case. */
+        /*     //None //can't use this here */
+        /*     , True, 0, GrabModeAsync, */
+        /*         GrabModeAsync, */
+        /*         //win */
+        /*         //DefaultRootWindow(dpy) // needing this to unconstrain */
+        /*         None //can use this here, same effect as root-win */
+        /*         , None, CurrentTime); */
+        /* XGrabButton(dpy, AnyButton, AnyModifier, */
+        /*     //win */
+        /*     DefaultRootWindow(dpy) */
+        /*     , True, 0, GrabModeAsync, GrabModeAsync, */
+        /*     //DefaultRootWindow(dpy) */
+        /*     None //works */
+        /*     , None); */
+        /* XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync, CurrentTime);  */
+        /* XGrabButton(dpy, AnyButton, AnyModifier, DefaultRootWindow(dpy), True, 0, GrabModeAsync, GrabModeAsync, None, None); */
+        capture_enabled = 1;
+    }
+    printf("Capture %s\n", capture_enabled ? "ON" : "OFF");
+    fflush(stdout);
+}
+
+
 int main (int argc, char **argv)
 {
-    Display *dpy;
     int xi_opcode, event, error;
     int major = 2, minor = 1;
     Window win;
@@ -132,6 +174,8 @@ int main (int argc, char **argv)
     win = create_win(dpy); //yes this is still necessary!
     // destroy_window(dpy, &win);
 
+    start_recording(toggle_capture);
+
     while(1)
     {
         XGenericEventCookie *cookie = &ev.xcookie;
@@ -139,25 +183,25 @@ int main (int argc, char **argv)
         XNextEvent(dpy, &ev);
 
         if (ev.type == MapNotify) {
-            XGrabPointer(dpy,
-                //win
-                DefaultRootWindow(dpy) // no change when using this, well the mentioned bug(events duplicated) doesn't happen anymore, but I meant no change for my use case.
-                //None //can't use this here
-                , True, 0, GrabModeAsync,
-                    GrabModeAsync,
-                    //win
-                    //DefaultRootWindow(dpy) // needing this to unconstrain
-                    None //can use this here, same effect as root-win
-                    , None, CurrentTime);
-            XGrabButton(dpy, AnyButton, AnyModifier,
-                //win
-                DefaultRootWindow(dpy)
-                , True, 0, GrabModeAsync, GrabModeAsync,
-                //DefaultRootWindow(dpy)
-                None //works
-                , None);
-            XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync, CurrentTime); 
-            XGrabButton(dpy, AnyButton, AnyModifier, DefaultRootWindow(dpy), True, 0, GrabModeAsync, GrabModeAsync, None, None);
+            /* XGrabPointer(dpy, */
+            /*     //win */
+            /*     DefaultRootWindow(dpy) // no change when using this, well the mentioned bug(events duplicated) doesn't happen anymore, but I meant no change for my use case. */
+            /*     //None //can't use this here */
+            /*     , True, 0, GrabModeAsync, */
+            /*         GrabModeAsync, */
+            /*         //win */
+            /*         //DefaultRootWindow(dpy) // needing this to unconstrain */
+            /*         None //can use this here, same effect as root-win */
+            /*         , None, CurrentTime); */
+            /* XGrabButton(dpy, AnyButton, AnyModifier, */
+            /*     //win */
+            /*     DefaultRootWindow(dpy) */
+            /*     , True, 0, GrabModeAsync, GrabModeAsync, */
+            /*     //DefaultRootWindow(dpy) */
+            /*     None //works */
+            /*     , None); */
+            /* XGrabKeyboard(dpy, DefaultRootWindow(dpy), True, GrabModeAsync, GrabModeAsync, CurrentTime);  */
+            /* XGrabButton(dpy, AnyButton, AnyModifier, DefaultRootWindow(dpy), True, 0, GrabModeAsync, GrabModeAsync, None, None); */
         }
         //if ((ev.type == KeyPress)||(cookie->type == KeyPress)||(cookie->evtype == KeyPress)) { // TODO: no idea how to make this work, Alt+F4 on 'win' is needed, or C-c on terminal(after an alt+tab)
         //  // types like KeyPress and MapNotify are listed in /usr/include/X11/X.h

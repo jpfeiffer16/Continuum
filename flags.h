@@ -1,0 +1,2 @@
+#define RECORD_FAILURE 0
+#define RECORD_SUCCESS 1

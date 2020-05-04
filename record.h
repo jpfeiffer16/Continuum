@@ -1,7 +1,10 @@
 #ifndef RECORD
 #define RECORD
 
-#define RECORD_FAILURE 0
-#define RECORD_SUCCESS 1
+#include "flags.h"
+
+int start_recording(void (*toggle)());
+
+int stop_recording();
 
 #endif

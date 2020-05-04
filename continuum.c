@@ -14,6 +14,7 @@ int main()
     char buf[BSIZE];
     while ((count = fread(buf, 1, BSIZE, stdin)) > 0)
     {
+        //TODO: Check count to make sure the chunk size is correct
         /* fprintf(stdout, "%c\n", buf[0]); */
         /* fflush(stdout); */
         /* char args[ARGSIZE] = {}; */
