@@ -14,10 +14,7 @@ int toggle_key;
 
 static void callback(XPointer prt, XRecordInterceptData *data)
 {
-    printf("Getting here");
     fflush(stdout);
-    XEvent test_event;
-    XNextEvent(display, &test_event);
     if (data->category == XRecordFromServer)
     {
         xEvent *event;
@@ -42,6 +39,8 @@ static void callback(XPointer prt, XRecordInterceptData *data)
             }
         }
     }
+    /* XEvent test_event; */
+    /* XNextEvent(display, &test_event); */
     fflush(stdout);
     XRecordFreeData(data);
 }
@@ -91,5 +90,6 @@ int start_recording(void (*toggle)())
 int stop_recording()
 {
     XRecordDisableContext(display, ctx);
-    XRecordFreeContext(display, ctx);
+    /* XRecordFreeContext(display, ctx); */
+    return STOP_RECORDING_SUCCESS;
 }

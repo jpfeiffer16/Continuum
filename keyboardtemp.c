@@ -63,7 +63,8 @@ int main()
             fflush(stdout);
 
             if (event.xkey.keycode == escape)
-                break;
+                XUngrabKeyboard(display, CurrentTime);
+                /* break; */
             // Forward event
             XEvent forwared_event;
             forwared_event.type = KeyPress;
@@ -117,6 +118,7 @@ int main()
     XUngrabKeyboard(display, CurrentTime);
 
     XDestroyWindow(display, window);
+
     XCloseDisplay(display);
     return 0;
 }
